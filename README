@@ -1,17 +1,17 @@
-+++ Conky Colour Change +++
+=== Conky Colour Change ===
 
-A Lua script and accompanying Conky config that allows users to define colours
+A Lua script and accompanying Conky config which allow users to define colours
 and colour transitions for their Conky indicators
 
---- Intallation Instructions ---
+*** Intallation Instructions ***
 
-Transfer conky.conf and lua.lua to the .conky directory of your home directory
-If this doesn't exist create it with:
+Transfer conky.conf and colour-change.lua to the .conky directory of your home
+directory. If this doesn't exist create it with:
 mkdir -p ~/.conky
 Use the script by invoking conky using the following from the terminal:
 conky -c ~/.conky/conky.conf
 
-If you wish to change the location of the conf file or the lua script you will
-need to alter the conf file to point to the new location of the script and alter
-the command line invocation of conky to reflect the new location of the conf
-file
+If you wish to change the location of the conf file or the lua script, or rename
+either, you will need to alter the conf file to point to the new location of the
+script and alter the command line invocation of conky to reflect the new
+location of the conf file

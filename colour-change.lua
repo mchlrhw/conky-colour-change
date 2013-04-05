@@ -16,14 +16,16 @@
 require 'cairo'
 require 'socket'
 
+-- Global settings table
+-- Change these values to alter the appearance of your indicators
 settings_table = {
     {
         -- Year of the century indicator
         name = 'smooth_time',
         arg = '%y',
         max = 100,
-        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.1,
-        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.7,
+        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.3,
+        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.8,
         x = 180, y = 180,
         radius = 160,
         thickness = 4,
@@ -35,8 +37,8 @@ settings_table = {
         name = 'smooth_time',
         arg = '%j',
         max = 365,
-        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.1,
-        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.7,
+        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.3,
+        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.8,
         x = 180, y = 180,
         radius = 150,
         thickness = 6,
@@ -49,8 +51,8 @@ settings_table = {
         arg = '%d',
         -- max is reset in the smooth_time function depending on the month
         max = 31,
-        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.1,
-        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.7,
+        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.3,
+        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.8,
         x = 180, y = 180,
         radius = 160,
         thickness = 4,
@@ -62,8 +64,8 @@ settings_table = {
         name = 'smooth_time',
         arg = '%u',
         max = 7,
-        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.1,
-        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.7,
+        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.3,
+        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.8,
         x = 180, y = 180,
         radius = 150,
         thickness = 6,
@@ -75,8 +77,8 @@ settings_table = {
         name = 'smooth_time',
         arg = '%I',
         max = 12,
-        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.1,
-        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.7,
+        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.3,
+        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.8,
         x = 180, y = 180,
         radius = 75,
         thickness = 12,
@@ -90,7 +92,7 @@ settings_table = {
         arg = '%H',
         max = 24,
         bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.1,
-        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.7,
+        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.8,
         x = 180, y = 180,
         radius = 75,
         thickness = 12,
@@ -102,8 +104,10 @@ settings_table = {
         name = 'smooth_time',
         arg = '%M',
         max = 60,
-        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.1,
-        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.7,
+        bg_clr_chng   = true,  bg_colour = 'default',
+        bg_alpha_chng = false, bg_alpha = 0.3,
+        fg_clr_chng   = true,  fg_colour = 'default',
+        fg_alpha_chng = false, fg_alpha = 0.8,
         x = 180, y = 180,
         radius = 90,
         thickness = 7,
@@ -115,8 +119,10 @@ settings_table = {
         name = 'smooth_time',
         arg = '%S',
         max = 60,
-        bg_clr_chng = true, bg_colour = 'default', bg_alpha = 0.1,
-        fg_clr_chng = true, fg_colour = 'default', fg_alpha = 0.7,
+        bg_clr_chng   = true,  bg_colour = 'default',
+        bg_alpha_chng = false, bg_alpha = 0.3,
+        fg_clr_chng   = true,  fg_colour = 'default',
+        fg_alpha_chng = false, fg_alpha = 0.8,
         x = 180, y = 180,
         radius = 120,
         thickness = 4,
@@ -160,6 +166,29 @@ function Colour:trans(colour, factor)
     return newr, newg, newb
 end
 
+Alpha = {}
+function Alpha:new(a)
+    local object = {r = r, g = g, b = b, a = a}
+    setmetatable(object, {__index = Alpha})
+    return object
+end
+function Alpha:a()
+    return self.a
+end
+function Alpha:cmp(colour)
+    return colour.a - self.a
+end
+function Alpha:trans(alpha, factor)
+    local diffa = self:cmp(colour)
+    local newa
+    if diffa ~= 0 then
+        newa = self.a + diffa + (factor * diffa)
+    else
+        newa = self.a
+    end
+    return newa
+end
+
 -- Colour presets
 -- NB. Transitions between some colours may or may not look good depending on
 -- the properties of the colours involved
@@ -185,9 +214,18 @@ raspberry = Colour:new(1,   0,   0.5)
 -- Feel free to add your own custom colours here
 dark_red  = Colour:new(0.4, 0,   0)
 
+-- Alpha presets
+on        = Alpha:new(1)
+off       = Alpha:new(0)
+half      = Alpha:new(0.5)
+fifth     = Alpha:new(0.2)
+tenth     = Alpha:new(0.1)
+-- Custom alphas
+-- Feel free to add your own custom alphas here
+
 -- rgb_change
 -- Define your colour profiles in this function
-function rgb_change(profile, alpha, arc_perc)
+function rgb_change(profile, arc_perc)
     local r, g, b = 0, 0, 0
     if profile == 'default' then
         local num_trans = 6
@@ -342,19 +380,27 @@ function rgb_change(profile, alpha, arc_perc)
         elseif transition == 0 then
             r, g, b = violet:rgb()
         end
-    elseif profile == 'pulse_alpha' then
-        local pulse_speed = 120
-        local range = 8
-        local arc_len = arc_perc * pulse_speed
-        local sector = math.ceil(arc_len)
-        if sector % 2 == 1 then
-            alpha = (arc_len - (sector - 1)) / range
-        else
-            alpha = (sector - arc_len) / range
-        end
-        r, g, b = 1, 1, 1
     end
-    return r, g, b, alpha
+    return r, g, b
+end
+
+function alpha_change(profile, arc_perc)
+    local a = 0
+    if profile == 'pulse' then
+        local num_trans = 6
+        local num_cycles = 120
+        local num_sctrs = num_trans * num_cycles
+        local arc_len = arc_perc * num_sctrs
+        local sector = math.ceil(arc_len)
+        local progress = arc_len - sector
+        local transition = sector % num_trans
+        if transition == 1 then
+            a = fifth:trans(tenth, progress)
+        elseif transition == 0 then
+            a = tenth:trans(fifth, progress)
+        end
+    end
+    return a
 end
 
 function rgb_to_r_g_b(colour, alpha)
@@ -423,6 +469,8 @@ function draw_ring(cr, t, pt)
     local bgc, bga, fgc, fga = pt['bg_colour'], pt['bg_alpha'],
         pt['fg_colour'], pt['fg_alpha']
     local bg_clr_chng, fg_clr_chng = pt['bg_clr_chng'], pt['fg_clr_chng']
+    local bg_alpha_chng = pt['bg_alpha_chng']
+    local fg_alpha_chng = pt['fg_alpha_chng']
 
     local angle_0 = sa * (2 * math.pi / 360) - math.pi / 2
     local angle_f = ea * (2 * math.pi / 360) - math.pi / 2
@@ -431,22 +479,20 @@ function draw_ring(cr, t, pt)
     -- Draw background ring
     cairo_arc(cr, xc, yc, ring_r, angle_0, angle_f)
     if bg_clr_chng then
-        -- New function holds colour change logic
-        cairo_set_source_rgba(cr, rgb_change(bgc, bga, t))
+        local r, g, b = rgb_change(bgc, t)
     else
-        -- Original set_source code
         cairo_set_source_rgba(cr, rgb_to_r_g_b(bgc, bga))
     end
+    cairo_set_source_rgba(cr, r, g, b, a)
     cairo_set_line_width(cr, ring_w)
     cairo_stroke(cr)
     
     -- Draw indicator ring
     cairo_arc(cr, xc, yc, ring_r, angle_0, angle_0 + t_arc)
     if fg_clr_chng then
-        -- New function holds colour change logic
-        cairo_set_source_rgba(cr, rgb_change(fgc, fga, t))
+        local r, g, b = rgb_change(fgc, t)
+        cairo_set_source_rgba(cr, r, g, b, fga)
     else
-        -- Original set_source code
         cairo_set_source_rgba(cr, rgb_to_r_g_b(fgc, fga))
     end
     cairo_stroke(cr)
