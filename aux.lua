@@ -60,7 +60,7 @@ function Alpha:trans(alpha, factor)
 end
 
 --====== smooth_time =========================================================--
-function smooth_time(pt)
+function smooth_time(indicator)
     local time = nil
     local yr   = conky_parse('${time %y}')
     local mon  = conky_parse('${time %m}')
@@ -74,36 +74,36 @@ function smooth_time(pt)
     local temp = os.time()
     local mils = socket.gettime() - temp
     
-    if pt['arg'] == '%y' then
+    if indicator['arg'] == '%y' then
         -- Year of the century
         time = yr + (doy / 365)
-    elseif pt['arg'] == '%j' then
+    elseif indicator['arg'] == '%j' then
         -- Day of the year
         time = (doy - 1) + (hr24 / 24)
-    elseif pt['arg'] == '%d' then
+    elseif indicator['arg'] == '%d' then
         -- Day of the month
         if mon == 1 or mon == 3 or mon == 5 or mon == 7 or mon == 8
             or mon == 10 or mon == 12 then
-                pt['max'] = 31
+                indicator['max'] = 31
         elseif mon == 2 then
-            pt['max'] = 28
+            indicator['max'] = 28
         else
-            pt['max'] = 30
+            indicator['max'] = 30
         end
         time = (dom - 1) + (hr24 / 24)
-    elseif pt['arg'] == '%u' then
+    elseif indicator['arg'] == '%u' then
         -- Day of the week
         time = (dow - 1) + (hr24 / 24) + (mins / 1440)
-    elseif pt['arg'] == '%I' then
+    elseif indicator['arg'] == '%I' then
         -- Hours
         time = (hr12 % 12) + (mins / 60) + (secs / 3600)
-    elseif pt['arg'] == '%H' then
+    elseif indicator['arg'] == '%H' then
         -- 24 hours
         time = hr24 + (mins / 60) + (secs / 3600)
-    elseif pt['arg'] == '%M' then
+    elseif indicator['arg'] == '%M' then
         -- Minutes
         time = mins + ((secs + mils) / 60)
-    elseif pt['arg'] == '%S' then
+    elseif indicator['arg'] == '%S' then
         -- Seconds
         time = secs + mils
     end
@@ -129,8 +129,8 @@ function draw_indicator(cairo, indicator, percent)
         local angle_f = e_angle * (2 * math.pi / 360) - math.pi / 2
         local arc_len = percent * (angle_f - angle_0)
         
-        local direction = indicator['direction']
-        if direction == 'clockwise' then
+        local clockwise = indicator['clockwise']
+        if clockwise then
             -- Draw background arc
             cairo_arc(cairo, x, y, radius, angle_0, angle_f)
             r, g, b = rgb_set(bgcc, bgcp, percent)
@@ -145,7 +145,7 @@ function draw_indicator(cairo, indicator, percent)
             a = alpha_set(fgac, fgap, percent)
             cairo_set_source_rgba(cairo, r, g, b, a)
             cairo_stroke(cairo)
-        elseif direction == 'anti-clockwise' then
+        else
             -- Draw background arc
             cairo_arc_negative(cairo, x, y, radius, angle_0, angle_f)
             r, g, b = rgb_set(bgcc, bgcp, percent)
@@ -162,7 +162,72 @@ function draw_indicator(cairo, indicator, percent)
             cairo_stroke(cairo)
         end
     elseif shape == 'bar' then
-        
+        local length, horizontal, inverted = 
+            indicator['length'], indicator['horizontal'], indicator['inverted']
+        local ind_len = percent * length
+        if horizontal then
+            if inverted then
+                x = x + length
+                -- Draw background bar
+                cairo_rectangle(cairo, x, y, -length, thickness)
+                r, g, b = rgb_set(bgcc, bgcp, percent)
+                a = alpha_set(bgac, bgap, percent)
+                cairo_set_source_rgba(cairo, r, g, b, a)
+                cairo_fill(cairo)
+                
+                -- Draw indicator bar
+                cairo_rectangle(cairo, x, y, -ind_len, thickness)
+                r, g, b = rgb_set(fgcc, fgcp, percent)
+                a = alpha_set(fgac, fgap, percent)
+                cairo_set_source_rgba(cairo, r, g, b, a)
+                cairo_fill(cairo)
+            else
+                -- Draw background bar
+                cairo_rectangle(cairo, x, y, length, thickness)
+                r, g, b = rgb_set(bgcc, bgcp, percent)
+                a = alpha_set(bgac, bgap, percent)
+                cairo_set_source_rgba(cairo, r, g, b, a)
+                cairo_fill(cairo)
+                
+                -- Draw indicator bar
+                cairo_rectangle(cairo, x, y, ind_len, thickness)
+                r, g, b = rgb_set(fgcc, fgcp, percent)
+                a = alpha_set(fgac, fgap, percent)
+                cairo_set_source_rgba(cairo, r, g, b, a)
+                cairo_fill(cairo)
+            end
+        else
+            if inverted then
+                y = y - length
+                -- Draw background bar
+                cairo_rectangle(cairo, x, y, thickness, length)
+                r, g, b = rgb_set(bgcc, bgcp, percent)
+                a = alpha_set(bgac, bgap, percent)
+                cairo_set_source_rgba(cairo, r, g, b, a)
+                cairo_fill(cairo)
+                
+                -- Draw indicator bar
+                cairo_rectangle(cairo, x, y, thickness, ind_len)
+                r, g, b = rgb_set(fgcc, fgcp, percent)
+                a = alpha_set(fgac, fgap, percent)
+                cairo_set_source_rgba(cairo, r, g, b, a)
+                cairo_fill(cairo)
+            else
+                -- Draw background bar
+                cairo_rectangle(cairo, x, y, thickness, -length)
+                r, g, b = rgb_set(bgcc, bgcp, percent)
+                a = alpha_set(bgac, bgap, percent)
+                cairo_set_source_rgba(cairo, r, g, b, a)
+                cairo_fill(cairo)
+                
+                -- Draw indicator bar
+                cairo_rectangle(cairo, x, y, thickness, -ind_len)
+                r, g, b = rgb_set(fgcc, fgcp, percent)
+                a = alpha_set(fgac, fgap, percent)
+                cairo_set_source_rgba(cairo, r, g, b, a)
+                cairo_fill(cairo)
+            end
+        end
     end
 end
 

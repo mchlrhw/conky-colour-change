@@ -294,8 +294,32 @@ settings_table = {
                                         -- can take. 'smooth_time' takes the %y,
                                         -- %m, %j, %d, %u, %I, %H, %M and %S
                                         -- arguments of the 'time' variable
+        shape = 'arc', ------------------- The shape of the indicator. Choose
+                                        -- between arc and bar. Each shape has a
+                                        -- different set of customisation
+                                        -- options
+        clockwise = true, ---------------- Whether arc indicators run clockwise
+                                        -- or anticlockwise
+        -- horizontal = true ------------- Whether bar indicators are horizontal
+                                        -- or vertical
+        -- inverted = false -------------- Whether to display left to right or
+                                        -- right to left on horizontal bars, or
+                                        -- bottom to top or top to bottom on
+                                        -- vertical bars 
         max = 100, ----------------------- The maximum value that the indicator
                                         -- can display
+        x = 180, y = 180, ---------------- The x and y coordinates to position
+                                        -- the indicator within the conky window
+        thickness = 4, ------------------- The line thickness of the indicator
+                                        -- (applies to both arcs and rectangles)
+        radius = 160, -------------------- The radius of arc indicators
+        start_angle = -60, --------------- The starting angle of arc indicators
+        end_angle = 60, ------------------ The ending angle of arc indicators
+                                        -- NB. The order of these matters. For
+                                        -- clockwise arcs the end angle must be
+                                        -- bigger than the start angle, and
+                                        -- vice-versa for anticlockwise arcs
+        -- length = 100 ------------------ The length of bar indicators                  
         bg_clr_change  = true, ----------- Whether to allow colour changing on
                                         -- the background indicator
         bg_clr_profile = 'default', ------ The colour profile for the background
@@ -310,129 +334,149 @@ settings_table = {
                                         -- true then this should be the name of
                                         -- one of the alpha change profiles
                                         -- defined in the alpha_set function
-                                        -- below, eg. default, or pulse
+                                        -- above, eg. default, or pulse
         fg_clr_change  = true, ----------- Same as for bg_clr_change
         fg_clr_profile = 'default', ------ Same as for bg_clr_profile
         fg_alp_change  = false, ---------- Same as for bg_alp_change
         fg_alp_profile = half, ----------- Same as for bg_alp_profile
-        x = 180, y = 180, ---------------- The x and y coordinates to position
-                                        -- the indicator within the conky window
-        radius = 160, -------------------- The radius of arc/ring indicators
-        thickness = 4, ------------------- The line thickness of the indicator
-        start_angle = -60, --------------- The starting angle of arc/ring
-                                        -- indicators
-        end_angle = 60 ------------------- The ending angle of arc/ring
-                                        -- indicators
     },
     {
         -- Day of the year indicator
         name = 'smooth_time',
         arg = '%j',
+        shape = 'arc',
+        clockwise = true,
         max = 365,
+        x = 180, y = 180,
+        thickness = 6,
+        radius = 150,
+        start_angle = -60,
+        end_angle = 60,
         bg_clr_change = true,  bg_clr_profile = 'default',
         bg_alp_change = false, bg_alp_profile = tenth,
         fg_clr_change = true,  fg_clr_profile = 'default',
         fg_alp_change = false, fg_alp_profile = half,
-        x = 180, y = 180,
-        radius = 150,
-        thickness = 6,
-        start_angle = -60,
-        end_angle = 60
     },
     {
         -- Day of the month indicator
         name = 'smooth_time',
         arg = '%d',
+        shape = 'arc',
+        clockwise = true,
         -- max for %d is reset in the smooth_time function depending on the
         -- month
         max = 31,
+        x = 180, y = 180,
+        thickness = 4,
+        radius = 160,
+        start_angle = 120,
+        end_angle = 240,
         bg_clr_change = true,  bg_clr_profile = 'default',
         bg_alp_change = false, bg_alp_profile = tenth,
         fg_clr_change = true,  fg_clr_profile = 'default',
         fg_alp_change = false, fg_alp_profile = half,
-        x = 180, y = 180,
-        radius = 160,
-        thickness = 4,
-        start_angle = 120,
-        end_angle = 240
     },
     {
         -- Day of the week indicator
         name = 'smooth_time',
         arg = '%u',
+        shape = 'arc',
+        clockwise = true,
         max = 7,
+        x = 180, y = 180,
+        thickness = 6,
+        radius = 150,
+        start_angle = 120,
+        end_angle = 240,
         bg_clr_change = true,  bg_clr_profile = 'default',
         bg_alp_change = false, bg_alp_profile = tenth,
         fg_clr_change = true,  fg_clr_profile = 'default',
         fg_alp_change = false, fg_alp_profile = half,
-        x = 180, y = 180,
-        radius = 150,
-        thickness = 6,
-        start_angle = 120,
-        end_angle = 240
     },
     {
         -- Hour indicator
         name = 'smooth_time',
         arg = '%I',
+        shape = 'arc',
+        clockwise = true,
         max = 12,
+        x = 180, y = 180,
+        thickness = 12,
+        radius = 75,
+        start_angle = 0,
+        end_angle = 360,
         bg_clr_change = true,  bg_clr_profile = 'default',
         bg_alp_change = false, bg_alp_profile = tenth,
         fg_clr_change = true,  fg_clr_profile = 'default',
         fg_alp_change = false, fg_alp_profile = half,
-        x = 180, y = 180,
-        radius = 75,
-        thickness = 12,
-        start_angle = 0,
-        end_angle = 360
     },
     -- Uncomment below and comment out above for 24 hour clock
     --[[{
         -- 24 hour indicator
         name = 'smooth_time',
         arg = '%H',
+        shape = 'arc',
+        clockwise = true,
         max = 24,
+        x = 180, y = 180,
+        thickness = 12,
+        radius = 75,
+        start_angle = 0,
+        end_angle = 360,
         bg_clr_change = true,  bg_clr_profile = 'default',
         bg_alp_change = false, bg_alp_profile = tenth,
         fg_clr_change = true,  fg_clr_profile = 'default',
         fg_alp_change = false, fg_alp_profile = half,
-        x = 180, y = 180,
-        radius = 75,
-        thickness = 12,
-        start_angle = 0,
-        end_angle = 360
     },]]
     {
         -- Minute indicator
         name = 'smooth_time',
         arg = '%M',
+        shape = 'arc',
+        clockwise = true,
         max = 60,
+        x = 180, y = 180,
+        thickness = 7,
+        radius = 90,
+        start_angle = 0,
+        end_angle = 360,
         bg_clr_change = true,  bg_clr_profile = 'default',
         bg_alp_change = false, bg_alp_profile = tenth,
         fg_clr_change = true,  fg_clr_profile = 'default',
         fg_alp_change = false, fg_alp_profile = half,
-        x = 180, y = 180,
-        radius = 90,
-        thickness = 7,
-        start_angle = 0,
-        end_angle = 360
     },
     {
         -- Second indicator
-        name  = 'smooth_time',
-        arg   = '%S',
+        name = 'smooth_time',
+        arg = '%S',
         shape = 'arc',
+        clockwise = true,
         max = 60,
         x = 180, y = 180,
         thickness = 4,
         radius = 120,
-        direction = 'clockwise',
         start_angle = 0,
         end_angle   = 360,
         bg_clr_change = true,  bg_clr_profile = 'default',
         bg_alp_change = false, bg_alp_profile = tenth,
         fg_clr_change = true,  fg_clr_profile = 'default',
-        fg_alp_change = false, fg_alp_profile = half
+        fg_alp_change = false, fg_alp_profile = half,
+    },
+    {
+        -- CPU indicator
+        name = 'cpu',
+        arg = 'cpu0',
+        shape = 'bar',
+        horizontal = false,
+        inverted = false,
+        max = 100,
+        x = 350, y = 350,
+        thickness = 12,
+        length = 320,
+        bg_clr_change = false,  bg_clr_profile = white,
+        bg_alp_change = false, bg_alp_profile = tenth,
+        fg_clr_change = true,  fg_clr_profile = 'traffic_light',
+        fg_alp_change = false, fg_alp_profile = half,
     },
 }
 
