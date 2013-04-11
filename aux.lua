@@ -123,16 +123,16 @@ function draw_indicator(cairo, indicator, percent)
     
     local shape = indicator['shape']
     if shape == 'arc' then
-        local radius, s_angle, e_angle = indicator['radius'],
-            indicator['start_angle'], indicator['end_angle']
+        local radius, s_angle, e_angle, clockwise = 
+            indicator['radius'], indicator['start_angle'],
+            indicator['end_angle'], indicator['clockwise']
         local angle_0 = s_angle * (2 * math.pi / 360) - math.pi / 2
         local angle_f = e_angle * (2 * math.pi / 360) - math.pi / 2
         local arc_len = percent * (angle_f - angle_0)
-        
-        local clockwise = indicator['clockwise']
+
         if clockwise then
             -- Draw background arc
-            cairo_arc(cairo, x, y, radius, angle_0, angle_f)
+            cairo_arc(cairo, x, y, radius, angle_0 + arc_len, angle_f)
             r, g, b = rgb_set(bgcc, bgcp, percent)
             a = alpha_set(bgac, bgap, percent)
             cairo_set_source_rgba(cairo, r, g, b, a)
@@ -147,7 +147,7 @@ function draw_indicator(cairo, indicator, percent)
             cairo_stroke(cairo)
         else
             -- Draw background arc
-            cairo_arc_negative(cairo, x, y, radius, angle_0, angle_f)
+            cairo_arc_negative(cairo, x, y, radius, angle_0 + arc_len, angle_f)
             r, g, b = rgb_set(bgcc, bgcp, percent)
             a = alpha_set(bgac, bgap, percent)
             cairo_set_source_rgba(cairo, r, g, b, a)
@@ -165,6 +165,7 @@ function draw_indicator(cairo, indicator, percent)
         local length, horizontal, inverted = 
             indicator['length'], indicator['horizontal'], indicator['inverted']
         local ind_len = percent * length
+        
         if horizontal then
             if inverted then
                 x = x + length

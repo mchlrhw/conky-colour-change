@@ -3,15 +3,46 @@
 A Lua script and accompanying Conky config which allow users to define colours
 and colour transitions for their Conky indicators
 
+*** colour-change.lua ***
+
+This is the main lua script file. It is this file that gets called from Conky.
+This file contains the settings for your indicators and can be altered without
+restarting Conky. Instructions for altering the indicator settings is included
+in the file itself.
+
+*** colours.lua ***
+
+This file is loaded by the main script and contains definitions for the colours
+you can use for your indicators and in your profiles. If this file is altered
+and colours are added, removed or modified you will need to restart Conky for
+the changes to take effect.
+
+*** colour-profiles.lua ***
+
+This file is also loaded by the main script and contains the logic that allows
+your indicators to change colour based on indicator length. The profiles
+themselves are defined as if-else statements within the rgb_set and alpha_set
+functions. Instructions for creating you own colour profiles are included in the
+file itself. If this file is altered and profiles are added, removed or modified
+you will need to restart Conky for the changes to take effect.
+
+*** aux.lua ***
+
+This file contains functions and settings that are used by the main script,
+including the smooth_time function, and should not need any modification.
+
 *** Intallation Instructions ***
 
-Transfer conky.conf and colour-change.lua to the .conky directory of your home
-directory. If this doesn't exist create it with:
+Transfer conky.conf and all of the lua script files to the .conky directory of
+your home directory. If this doesn't exist create it with:
 mkdir -p ~/.conky
 Use the script by invoking conky using the following from the terminal:
 conky -c ~/.conky/conky.conf
 
-If you wish to change the location of the conf file or the lua script, or rename
-either, you will need to alter the conf file to point to the new location of the
-script and alter the command line invocation of conky to reflect the new
-location of the conf file
+If you wish to change the location of the conf file or any of the lua scripts,
+or rename any of the files, you will need to alter the conf file to point to the
+new location of the main script and alter the command line invocation of conky
+to reflect the new location of the conf file. If the location of aux.lua,
+colours.lua or colour-profiles.lua is not ~/.conky/ you will also have to modify
+the load statements in the main script to point to the new locations of these
+files.
