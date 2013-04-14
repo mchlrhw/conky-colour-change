@@ -1,7 +1,7 @@
 --[[
     Conky Colour Change by mrmrwat
     A fork of Ring Meters v1.2.1 by londonali1010
-    Inspired by PolarClock by pixelbreaker
+    Colour change functionality inspired by PolarClock by pixelbreaker
     
     Features:
     -- Support for colour changing background and foreground indicators
@@ -21,7 +21,7 @@
     -- Indicators can be either arcs or bars
     -- Arcs can increase clockwise or anticlockwise
     -- Bars can be oriented horizontally or vertically and can increase right to
-    -- left, left to right, bottom to top, or top to bottom
+       left, left to right, bottom to top, or top to bottom
 --]]
 require 'cairo'
 require 'socket'
@@ -249,10 +249,10 @@ function conky_colour_change_main()
         conky_window.width, conky_window.height)
     local cairo = cairo_create(surface) 
     
-    local updates = conky_parse('${updates}')
-    update_num = tonumber(updates)
+    updates = conky_parse('${updates}')
+    updates = tonumber(updates)
     
-    if update_num > 5 then
+    if updates > 0 then
         for i in pairs(settings_table) do
             -- the setup_indicators function can be found in the aux.lua file
             -- along with the other auxiliary functions 

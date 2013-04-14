@@ -88,7 +88,11 @@ function rgb_set(clr_chng, profile, arc_perc)
             local sector = math.ceil(arc_len)
             local progress = arc_len - sector
             local transition = sector % num_trans
-            if transition == 1 then
+            -- If the last transition does not meet up with the first, i.e. the
+            -- colour pattern is not circular, and you would like to have the
+            -- absolute zero value be equal to the first transition it is
+            -- neccessary to include an arc_len == 0 condition, as shown below
+            if transition == 1 or arc_len == 0 then
                 r, g, b = green:rgb()
             elseif transition == 2 then
                 r, g, b = green:rgb()

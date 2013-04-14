@@ -170,7 +170,7 @@ function draw_indicator(cairo, indicator, percent)
             if inverted then
                 x = x + length
                 -- Draw background bar
-                cairo_rectangle(cairo, x, y, -length, thickness)
+                cairo_rectangle(cairo, x - ind_len, y, -length + ind_len, thickness)
                 r, g, b = rgb_set(bgcc, bgcp, percent)
                 a = alpha_set(bgac, bgap, percent)
                 cairo_set_source_rgba(cairo, r, g, b, a)
@@ -184,7 +184,7 @@ function draw_indicator(cairo, indicator, percent)
                 cairo_fill(cairo)
             else
                 -- Draw background bar
-                cairo_rectangle(cairo, x, y, length, thickness)
+                cairo_rectangle(cairo, x + ind_len, y, length - ind_len, thickness)
                 r, g, b = rgb_set(bgcc, bgcp, percent)
                 a = alpha_set(bgac, bgap, percent)
                 cairo_set_source_rgba(cairo, r, g, b, a)
@@ -201,7 +201,7 @@ function draw_indicator(cairo, indicator, percent)
             if inverted then
                 y = y - length
                 -- Draw background bar
-                cairo_rectangle(cairo, x, y, thickness, length)
+                cairo_rectangle(cairo, x, y + ind_len, thickness, length - ind_len)
                 r, g, b = rgb_set(bgcc, bgcp, percent)
                 a = alpha_set(bgac, bgap, percent)
                 cairo_set_source_rgba(cairo, r, g, b, a)
@@ -215,7 +215,7 @@ function draw_indicator(cairo, indicator, percent)
                 cairo_fill(cairo)
             else
                 -- Draw background bar
-                cairo_rectangle(cairo, x, y, thickness, -length)
+                cairo_rectangle(cairo, x, y - ind_len, thickness, -length + ind_len)
                 r, g, b = rgb_set(bgcc, bgcp, percent)
                 a = alpha_set(bgac, bgap, percent)
                 cairo_set_source_rgba(cairo, r, g, b, a)
@@ -228,6 +228,107 @@ function draw_indicator(cairo, indicator, percent)
                 cairo_set_source_rgba(cairo, r, g, b, a)
                 cairo_fill(cairo)
             end
+        end
+    end
+end
+
+--====== draw_graph ==========================================================--
+function draw_graph(cairo, indicator, graph_vals)
+    local x, y = indicator['x'], indicator['y']
+    local bgcc, bgcp, bgac, bgap, fgcc, fgcp, fgac, fgap =
+        indicator['bg_clr_change'], indicator['bg_clr_profile'],
+        indicator['bg_alp_change'], indicator['bg_alp_profile'],
+        indicator['fg_clr_change'], indicator['fg_clr_profile'],
+        indicator['fg_alp_change'], indicator['fg_alp_profile']
+    local r, g, b, a = 0, 0, 0, 1
+    
+    local length, height, horizontal, inverted, history_sz = 
+        indicator['length'], indicator['height'],
+        indicator['horizontal'], indicator['inverted'],
+        indicator['history_sz']
+        
+    local thickness = length / history_sz
+    
+    if horizontal then
+        if inverted then
+            x = x + length
+            -- Draw background bar
+            cairo_rectangle(cairo, x - ind_len, y, -length + ind_len, thickness)
+            r, g, b = rgb_set(bgcc, bgcp, percent)
+            a = alpha_set(bgac, bgap, percent)
+            cairo_set_source_rgba(cairo, r, g, b, a)
+            cairo_fill(cairo)
+            
+            -- Draw indicator bar
+            cairo_rectangle(cairo, x, y, -ind_len, thickness)
+            r, g, b = rgb_set(fgcc, fgcp, percent)
+            a = alpha_set(fgac, fgap, percent)
+            cairo_set_source_rgba(cairo, r, g, b, a)
+            cairo_fill(cairo)
+        else
+            for i = 1, history_sz do
+                local bar_x = x + (i * thickness)
+                local ind_len = graph_vals[i] * height
+                -- Draw background bar
+                cairo_rectangle(cairo, bar_x, y - ind_len,
+                    thickness, -height + ind_len)
+                r, g, b = rgb_set(bgcc, bgcp, graph_vals[history_sz])
+                a = alpha_set(bgac, bgap, graph_vals[history_sz])
+                cairo_set_source_rgba(cairo, r, g, b, a)
+                cairo_fill(cairo)
+                
+                -- Draw indicator bar
+                cairo_rectangle(cairo, bar_x, y, thickness, -ind_len)
+                r, g, b = rgb_set(fgcc, fgcp, graph_vals[i])
+                a = alpha_set(fgac, fgap, graph_vals[i])
+                cairo_set_source_rgba(cairo, r, g, b, a)
+                cairo_fill(cairo)
+            end
+            --[[
+            -- Draw background bar
+            cairo_rectangle(cairo, x + ind_len, y, length - ind_len, thickness)
+            r, g, b = rgb_set(bgcc, bgcp, percent)
+            a = alpha_set(bgac, bgap, percent)
+            cairo_set_source_rgba(cairo, r, g, b, a)
+            cairo_fill(cairo)
+            
+            -- Draw indicator bar
+            cairo_rectangle(cairo, x, y, ind_len, thickness)
+            r, g, b = rgb_set(fgcc, fgcp, percent)
+            a = alpha_set(fgac, fgap, percent)
+            cairo_set_source_rgba(cairo, r, g, b, a)
+            cairo_fill(cairo)]]
+        end
+    else
+        if inverted then
+            y = y - length
+            -- Draw background bar
+            cairo_rectangle(cairo, x, y + ind_len, thickness, length - ind_len)
+            r, g, b = rgb_set(bgcc, bgcp, percent)
+            a = alpha_set(bgac, bgap, percent)
+            cairo_set_source_rgba(cairo, r, g, b, a)
+            cairo_fill(cairo)
+            
+            -- Draw indicator bar
+            cairo_rectangle(cairo, x, y, thickness, ind_len)
+            r, g, b = rgb_set(fgcc, fgcp, percent)
+            a = alpha_set(fgac, fgap, percent)
+            cairo_set_source_rgba(cairo, r, g, b, a)
+            cairo_fill(cairo)
+        else
+            -- Draw background bar
+            cairo_rectangle(cairo, x, y - ind_len, thickness, -length + ind_len)
+            r, g, b = rgb_set(bgcc, bgcp, percent)
+            a = alpha_set(bgac, bgap, percent)
+            cairo_set_source_rgba(cairo, r, g, b, a)
+            cairo_fill(cairo)
+            
+            -- Draw indicator bar
+            cairo_rectangle(cairo, x, y, thickness, -ind_len)
+            r, g, b = rgb_set(fgcc, fgcp, percent)
+            a = alpha_set(fgac, fgap, percent)
+            cairo_set_source_rgba(cairo, r, g, b, a)
+            cairo_fill(cairo)
         end
     end
 end
@@ -246,7 +347,28 @@ function setup_indicators(cairo, indicator)
         value = tonumber(str)
     end
     
-    percent = value / indicator['max']
-    
-    draw_indicator(cairo, indicator, percent)
+    if value ~= nil then
+        percent = value / indicator['max']
+        
+        if indicator['shape'] == 'graph' then
+            local history_sz = tonumber(indicator['history_sz'])
+            if indicator['graph'] == nil then
+                indicator['graph'] = {}
+                for i = 1, history_sz do
+                    indicator['graph'][i] = 0
+                end
+            else
+                for i = 1, history_sz do
+                    if i == history_sz then
+                        indicator['graph'][i] = percent
+                    else
+                        indicator['graph'][i] = indicator['graph'][i + 1]
+                    end
+                end
+                draw_graph(cairo, indicator, indicator['graph'])
+            end
+        else
+            draw_indicator(cairo, indicator, percent)
+        end
+    end
 end
